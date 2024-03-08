@@ -42,15 +42,20 @@ def start_game(plane_status, plane, player_data):   # запуск уровня,
 
 
 def buy_plane(plane, player_data, planes_available, all_planes, menu):   # покупка самолета
-    result = cursor.execute(f"""SELECT price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
+    plane_data = cursor.execute(f"""SELECT id, price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
 
     if compare_data(plane, planes_available, all_planes) == '0':
-        data_master.change_value(result[0], player_data, plane)
+        data_master.change_value(plane_data[1], player_data, plane_data[0])
         menu.close()
-        start(data_master.check_player(*player_data[:2]))
+        _, user_data = data_master.check_player(*player_data[:2])
+        print("data after purchase:", user_data)
+        start(user_data)
 
 
-def start(player_data):   # меню с выбором самолета, приобритениием его
+def start(player_data):
+    # меню с выбором самолета, его приобретением
+
+    print("player_data on start:", player_data)
     pygame.init()
     planes = []
 
@@ -80,7 +85,7 @@ def start(player_data):   # меню с выбором самолета, при�
     pic_place = menu.add.image("data/real_pics/i-15.jpg", load_from_file=True, align=pygame_menu.locals.ALIGN_RIGHT)
     info_btn = menu.add.button('View plane info', align=pygame_menu.locals.ALIGN_RIGHT, font_size=16)
     buy_button = menu.add.button('', buy_plane(current_plane.get_value(),
-                                               player_data, player_data[4], planes, menu),
+                                               player_data, player_data[3], planes, menu),
                                  align=pygame_menu.locals.ALIGN_RIGHT, font_size=26)
     start_btn = menu.add.button('Play level', align=pygame_menu.locals.ALIGN_LEFT, font_size=30)
     menu.add.button('Quit', pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_RIGHT, font_size=18)
@@ -91,14 +96,14 @@ def start(player_data):   # меню с выбором самолета, при�
     running = True
 
     while running:
-        draw_background(current_plane.get_value(), buy_button, pic_place, player_data[4], planes)
+        draw_background(current_plane.get_value(), buy_button, pic_place, player_data[3], planes)
         events = pygame.event.get()
 
         for event in events:  # проверка кнопок: сделанно именно так, тк встроенные функции не полностью удовлетворяли
             # нужному функционалу
 
             if event.type == pygame.MOUSEBUTTONDOWN and buy_button._mouseover and event.button == 1:
-                buy_plane(current_plane.get_value(), player_data, player_data[4], planes, menu)
+                buy_plane(current_plane.get_value(), player_data, player_data[3], planes, menu)
 
             if event.type == pygame.MOUSEBUTTONDOWN and start_btn._mouseover and event.button == 1:
                 start_game(buy_button, current_plane.get_value(), player_data)

@@ -1,5 +1,4 @@
 from game_objects.game_objects import Player, Enemy, Background
-from settings import sc_size as size, height, width
 import pygame
 import random
 
@@ -9,19 +8,20 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     k_spawn = 0
     k_shoot = 0
     score = 0
+    size = width, height = 1500, 1500
 
     screen = pygame.display.set_mode(size)
-    img_path = random.choice(['data/backgrounds/jungles.png',
-                              'data/backgrounds/forest.png',
-                              'data/backgrounds/mountains.png'])
-    font = pygame.font.Font('data/fonts/font.ttf', 30)
+    img_path = random.choice(['./data/backgrounds/jungles.png',
+                              './data/backgrounds/forest.png',
+                              './data/backgrounds/mountains.png'])
+    font = pygame.font.Font('./data/fonts/font.ttf', 30)
 
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
     enemy_bullets = pygame.sprite.Group()
     player_bullets = pygame.sprite.Group()
 
-    background = Background(img_path, plane_data[3])
+    background = Background(img_path, plane_data[5])
 
     player = Player(plane_data)
     players.add(player)
@@ -60,6 +60,10 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
 
         for enemy in enemies:
             enemy.move()
+            if random.choice([True, False]):
+                enemy.move_right(width)
+            else:
+                enemy.move_left()
             if k_shoot == 80:
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets):

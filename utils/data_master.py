@@ -6,7 +6,6 @@ from pygame import mixer
 from menu import game_menu
 from settings import *
 
-
 conn = sqlite3.connect('./resources/vehicles.db')
 cursor = conn.cursor()
 
@@ -19,7 +18,7 @@ def check_player(name: str, password: str) -> (bool, list[any]):
     cursor.execute("SELECT * FROM users WHERE login = ?", (name,))
     player_data = cursor.fetchone()
     if player_data and player_data[2] == password:
-        return True, player_data
+        return True, player_data[1:]
     elif player_data and player_data[2] != password:
         return False, player_data
     else:
@@ -27,17 +26,24 @@ def check_player(name: str, password: str) -> (bool, list[any]):
                        (name, password, 0, "1" + "0" * 7, 0))
         conn.commit()
         cursor.execute("SELECT * FROM users WHERE login = ?", (name,))
-        return True, cursor.fetchone()
+        return True, cursor.fetchone()[1:]
 
 
-def change_value(price, player_data, plane):
+def change_value(price, player_data, plane_id):
     """
     Purchase a plane and deduct its price from the player's money.
     """
-    new_money = player_data[3] - price
-    if new_money < 0:
+    print(player_data)
+    if player_data[2] - price < 0:
         return False
-    cursor.execute("UPDATE users SET money = ?, planes = ? WHERE id = ?", (new_money, player_data[4] + plane + ",", player_data[0]))
+
+    new_planes = ''.join('1' if idx == int(plane_id) else val for idx, val in enumerate(player_data[3]))
+    print(new_planes)
+
+    cursor.execute("UPDATE users SET money = ?, planes = ? WHERE login = ?",
+                   (player_data[2] - price,
+                    new_planes,
+                    player_data[0]))
     conn.commit()
     return True
 
@@ -46,12 +52,14 @@ def change_score_money(player_data, score):
     """
     Update player's money and maximum score.
     """
-    new_max_score = max(player_data[5], score)
-    cursor.execute("UPDATE users SET money = ?, max_score = ? WHERE id = ?", (player_data[3] + score, new_max_score, player_data[0]))
+    new_max_score = max(player_data[4], score)
+    cursor.execute("UPDATE users SET money = ?, max_score = ? WHERE login = ?",
+                   (player_data[2] + score, new_max_score, player_data[0]))
     conn.commit()
 
 
 def show_info(player_data):
+
     """
     Show leaderboard and provide buttons for additional actions.
     """
@@ -61,14 +69,14 @@ def show_info(player_data):
 
     pygame.init()
     pygame.display.set_caption('Results')
-    win = mixer.Sound('../data/music/win.mp3')
+    win = mixer.Sound('./data/music/win.mp3')
     win.set_volume(0.5)
     win.play()
 
-    mixer.music.load('../data/music/theme.mp3')
+    mixer.music.load('./data/music/theme.mp3')
     mixer.music.set_volume(0.2)
     mixer.music.play(-1)
-    background = pygame_menu.baseimage.BaseImage('../data/backgrounds/background.jpg')
+    background = pygame_menu.baseimage.BaseImage('./data/backgrounds/background.jpg')
     surface = pygame.display.set_mode(sc_size)
 
     my_theme = Theme(background_color=(0, 0, 0, 0), title_background_color=(4, 47, 126),
@@ -81,13 +89,13 @@ def show_info(player_data):
     menu.add.label('GAME OVER', font_size=50)
     menu.add.label('Leaderboard')
     table = menu.add.table(font_size=30, border_color=pygame.Color('white'), border_width=3)
-    for gamer in players:
-        table.add_row(gamer)
+    for gamer in leaderboard_data:
+        table.add_row(tuple(gamer))
     continue_btn = menu.add.button('Continue', font_size=35)
     menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30)
     menu.center_content()
     engine = sound.Sound(-1)
-    engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')
+    engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, './data/music/button.wav')
     menu.set_sound(engine, recursive=True)
 
     while True:

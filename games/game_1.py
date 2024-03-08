@@ -1,5 +1,4 @@
 from game_objects.game_objects import Player, EnemyBase, AARocket, Decorations, Background
-from settings import sc_size as size, height, width
 import pygame
 import random
 
@@ -10,12 +9,13 @@ def play(plane_data, player_data):
     k_spawn_aa = 0
     k_spawn_decs = 0
     score = 0
+    size = width, height = 1500, 1500
 
     screen = pygame.display.set_mode(size)
-    img_path = random.choice(['data/backgrounds/jungles.png',
-                              'data/backgrounds/forest.png',
-                              'data/backgrounds/mountains.png'])
-    font = pygame.font.Font('data/fonts/font.ttf', 30)
+    img_path = random.choice(['./data/backgrounds/jungles.png',
+                              './data/backgrounds/forest.png',
+                              './data/backgrounds/mountains.png'])
+    font = pygame.font.Font('./data/fonts/font.ttf', 30)
 
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
@@ -23,7 +23,7 @@ def play(plane_data, player_data):
     bombs = pygame.sprite.Group()
     enemy_aa = pygame.sprite.Group()
 
-    background = Background(img_path, plane_data[3])
+    background = Background(img_path, plane_data[5])
     player = Player(plane_data)
     players.add(player)
 
@@ -55,16 +55,16 @@ def play(plane_data, player_data):
             if event.type == pygame.QUIT:
                 running = False
 
-        enemy_base = EnemyBase(plane_data[3], [random.randint(0, width - 150), 0])
+        enemy_base = EnemyBase(plane_data[5], [random.randint(0, width - 150), 0])
         if enemy_base.check_collision(enemies) and k_spawn == 50 and enemy_base.check_collision(decorations):
             enemies.add(enemy_base)
 
-        decor = Decorations(plane_data[3], *[random.randint(0, width - 150), 0])
+        decor = Decorations(plane_data[5], *[random.randint(0, width - 150), 0])
         if decor.check_collision(decorations) and k_spawn_decs == 30 and decor.check_collision(enemies):
             decorations.add(decor)
 
         if k_spawn_aa == 150:
-            aa = AARocket(plane_data[12], player.rect.x + 25, height)
+            aa = AARocket(player.rect.x + 25, height)
             enemy_aa.add(aa)
             aa.chase()
 
