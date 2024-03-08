@@ -60,10 +60,6 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
 
         for enemy in enemies:
             enemy.move()
-            if random.choice([True, False]):
-                enemy.move_right(width)
-            else:
-                enemy.move_left()
             if k_shoot == 80:
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets):

@@ -5,6 +5,7 @@ from utils import data_master
 from random import choice
 import threading
 
+
 cwd = os.getcwd()
 
 
@@ -237,22 +238,10 @@ class Enemy(BasicSprite):
                                                                    '0.png'))] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
-                             [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))], 10)
+                             [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))], 6)
         self.rect.x = enemy_pos[0]
         self.rect.y = enemy_pos[1]
         self.sound = mixer.Sound(os.path.join(cwd, 'data', 'music', 'explosion.wav'))
-
-    def move_left(self):
-        if self.rect.x <= 0:
-            self.rect.x = 0
-        else:
-            self.rect.x -= self.speed
-
-    def move_right(self, width):
-        if self.rect.x >= width - self.rect.width:
-            self.rect.x = width - self.rect.width
-        else:
-            self.rect.x += self.speed
 
     def shot(self, bullets):
         collided = pygame.sprite.spritecollideany(self, bullets)
