@@ -5,7 +5,6 @@ from utils import data_master
 from random import choice
 import threading
 
-
 cwd = os.getcwd()
 
 
@@ -39,12 +38,20 @@ class BasicSprite(pygame.sprite.Sprite):
 
 class Player(BasicSprite):
     def __init__(self, plane_data, width, height):
+        self.plane_images = [(os.path.join(cwd, 'data', 'planes', f"{i}", plane_data[2])) for i in
+                             range(7)]
+
+        self.neutral_frame = pygame.image.load(self.plane_images[0])
+        self.right_frames = [pygame.image.load(img) for img in self.plane_images[1:4]]
+        self.left_frames = [pygame.image.load(img) for img in self.plane_images[4:]]
+
         BasicSprite.__init__(self,
                              [pygame.image.load(os.path.join(cwd, 'data', 'planes', '0', plane_data[2]))] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))],
                              plane_data[5])
+
         self.bullets = plane_data[9]
         self.bombs = int(plane_data[8])
         self.rockets = int(plane_data[10])
@@ -57,15 +64,6 @@ class Player(BasicSprite):
         self.turning_l = 0
         self.rect.x = int(width * 0.5)
         self.rect.y = int(height * 0.5)
-
-    def update_animation(self, group):
-        if self.cur_frame < len(self.frames) - 1 and self.destroyed:
-            self.cur_frame += 1
-            self.image = self.frames[self.cur_frame]
-        elif self.destroyed:
-            group.remove(self)
-            self.sound.set_volume(0.5)
-            self.sound.play()
 
     def move_up(self):
         if self.rect.y <= 0:
@@ -84,17 +82,23 @@ class Player(BasicSprite):
             self.rect.x = 0
         else:
             self.rect.x -= self.speed
+            self.turning_r = 0
             self.turning_l += 1
+            self.update_on_turn()
 
     def move_right(self, width):
         if self.rect.x >= width - self.rect.width:
             self.rect.x = width - self.rect.width
         else:
             self.rect.x += self.speed
+            self.turning_l = 0
             self.turning_r += 1
+            self.update_on_turn()
 
     def update(self, group, player_data, plane_data, score):
         if self.down and self.cur_frame < len(self.frames) - 1 and self.exploding:
+            self.turning_r = 0
+            self.turning_l = 0
             self.cur_frame += 1
             self.image = self.frames[self.cur_frame]
         elif self.down:
@@ -109,6 +113,14 @@ class Player(BasicSprite):
             add_points.start()
             _, user_data = data_master.check_player(player_data[0], player_data[1])
             data_master.show_info(user_data)
+
+    def update_on_turn(self):
+        if self.turning_r > 0:
+            self.image = self.right_frames[min(max(self.turning_r - 4, 0) // 4, 2)]
+        elif self.turning_l > 0:
+            self.image = self.left_frames[min(max(self.turning_l - 4, 0) // 4, 2)]
+        else:
+            self.image = self.neutral_frame
 
     def shoot(self, group):
         if self.bullets > 0:
@@ -159,9 +171,11 @@ class Player(BasicSprite):
 
     def not_turning(self, vector):
         if self.turning_l > 0 and vector == -1:
-            self.turning_l -= 1
+            self.turning_l -= 4
+            self.update_on_turn()
         if self.turning_r > 0 and vector == 1:
-            self.turning_r -= 1
+            self.turning_r -= 4
+            self.update_on_turn()
 
 
 class Bullet(pygame.sprite.Sprite):
