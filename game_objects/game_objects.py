@@ -7,11 +7,11 @@ from random import choice
 import threading
 
 cwd = os.getcwd()
-enemy_map = {"enemy_1.png": {"health": 10, "speed": 4},
-             "enemy_2.png": {"health": 8, "speed": 5},
-             "enemy_3.png": {"health": 6, "speed": 5},
-             "enemy_4.png": {"health": 5, "speed": 6},
-             "enemy_5.png": {"health": 4, "speed": 5}}
+enemy_map = {"enemy_1.png": {"health": 6, "speed": 3},
+             "enemy_2.png": {"health": 5, "speed": 3},
+             "enemy_3.png": {"health": 5, "speed": 3},
+             "enemy_4.png": {"health": 5, "speed": 4},
+             "enemy_5.png": {"health": 3, "speed": 3}}
 
 
 class BasicSprite(pygame.sprite.Sprite):
@@ -263,7 +263,7 @@ class AARocket(BasicSprite):
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))],
-                             20)
+                             16)
         self.rect.x = x
         self.rect.y = height
         self.sound = mixer.Sound(os.path.join(cwd, 'data', 'music', 'explosion.wav'))
@@ -305,7 +305,7 @@ class Enemy(BasicSprite):
         return False
 
     def shoot(self, group):
-        bullet = Bullet(pygame.image.load(os.path.join(cwd, 'data', 'arms', 'bullet.png')), self.speed * 1.5,
+        bullet = Bullet(pygame.image.load(os.path.join(cwd, 'data', 'arms', 'bullet.png')), self.speed,
                         self.rect.midbottom)
         group.add(bullet)
 
@@ -314,13 +314,24 @@ class Enemy(BasicSprite):
 
 
 class Decorations(BasicSprite):
-    def __init__(self, speed, x, y):
-        building = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
-                           'building7'])
-        BasicSprite.__init__(self,
-                             [pygame.image.load(os.path.join(cwd, 'data', 'backgrounds', building, 'image1.png'))] +
-                             [pygame.image.load(os.path.join(cwd, 'data', 'backgrounds', building, 'image4.png'))],
-                             speed * 0.5)
+    def __init__(self, speed, x, y, level=1):
+        if level == 2:
+            decoration = choice([str(i) for i in range(1, 11)])
+            frames = [pygame.image.load(os.path.join(cwd, 'data', 'backgrounds', 'clouds', f"{decoration}.png"))] + [
+                pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))]
+        else:
+            if choice([True, False]):
+                decoration = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
+                                     'building7'])
+                frames = [pygame.image.load(
+                    os.path.join(cwd, 'data', 'backgrounds', decoration, 'image1.png'))] + [pygame.image.load(
+                    os.path.join(cwd, 'data', 'backgrounds', decoration, 'image4.png'))]
+            else:
+                decoration = choice([str(i) for i in range(1, 13)])
+                frames = [pygame.image.load(os.path.join(cwd, 'data', 'backgrounds', 'trees', f"{decoration}.png"))] + [
+                    pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))]
+
+        BasicSprite.__init__(self, frames, speed * 0.5)
         self.rect.x = x
         self.rect.y = y
 

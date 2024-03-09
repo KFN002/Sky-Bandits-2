@@ -1,4 +1,4 @@
-from game_objects.game_objects import Player, Enemy, Background
+from game_objects.game_objects import Player, Enemy, Background, Decorations
 import pygame
 import random
 
@@ -8,7 +8,8 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     k_spawn = 0
     k_shoot = 0
     score = 0
-    size = width, height = 1500, 900
+    k_spawn_dec = 0
+    size = width, height = 1200, 800
 
     screen = pygame.display.set_mode(size)
     img_path = random.choice(['./data/backgrounds/jungles.png',
@@ -21,6 +22,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     enemy_bullets = pygame.sprite.Group()
     player_bullets = pygame.sprite.Group()
     player_rockets = pygame.sprite.Group()
+    decorations = pygame.sprite.Group()
 
     background = Background(img_path, plane_data[5], level_k=0.5)
 
@@ -29,7 +31,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
 
     running = True
     screen.fill('white')
-    fps = 144
+    fps = 60
     clock = pygame.time.Clock()
 
     while running:
@@ -63,13 +65,17 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
             if event.type == pygame.QUIT:
                 running = False
 
-        enemy = Enemy([random.randint(0, width - 150), 0])
-        if enemy.check_collision(enemies) and k_spawn == (int((1 / plane_data[5] * 100) * 6)):
+        enemy = Enemy([random.randint(0, width - 150), -50])
+        if enemy.check_collision(enemies) and k_spawn == 80:
             enemies.add(enemy)
+
+        decor = Decorations(plane_data[5] * 0.4, *[random.randint(0, width - 150), -50], 2)
+        if decor.check_collision(decorations) and k_spawn_dec == 20 and decor.check_collision(enemies):
+            decorations.add(decor)
 
         for enemy in enemies:
             enemy.move()
-            if k_shoot == (int((1 / plane_data[5] * 100) * 6)):
+            if k_shoot == 60:
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets, plane_data[7]):
                 score += 1
@@ -95,6 +101,9 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         for enemy_bullet in enemy_bullets:
             enemy_bullet.update(-1)
 
+        for dec in decorations:
+            dec.move()
+
         score_text = font.render(f'Score: {score}', True, (255, 255, 255))
         health_text = font.render(f'Health: {player.hits}', True, (255, 255, 255))
         bullets_text = font.render(f'Bullets: {player.bullets}', True, (255, 255, 255))
@@ -112,6 +121,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
 
         background.update()
         background.render(screen)
+        decorations.draw(screen)
         players.draw(screen)
         enemies.draw(screen)
         enemy_bullets.draw(screen)
@@ -123,7 +133,8 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         screen.blit(rockets_text, rockets_rect)
 
         clock.tick(fps)
-        k_spawn = (k_spawn + 1) % (int((1 / plane_data[5] * 100) * 6) + 1)
-        k_shoot = (k_shoot + 1) % (int((1 / plane_data[5] * 100) * 6) + 1)
+        k_spawn = (k_spawn + 1) % 81
+        k_shoot = (k_shoot + 1) % 61
+        k_spawn_dec = (k_spawn_dec + 1) % 21
         pygame.display.flip()
     pygame.quit()

@@ -1,1 +1,1 @@
-sc_size = width, height = 1920, 1080
+sc_size = width, height = 1200, 700
