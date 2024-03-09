@@ -1,5 +1,4 @@
 import os
-
 import games.game_2
 import games.game_1
 from utils import data_master
