@@ -28,7 +28,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
 
     running = True
     screen.fill('white')
-    fps = 60
+    fps = 144
     clock = pygame.time.Clock()
 
     while running:
@@ -46,6 +46,9 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
             player.move_right(width)
 
+        if not (key_pressed[pygame.K_a] or key_pressed[pygame.K_LEFT]) and not(key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]):
+            pass
+
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
@@ -55,12 +58,12 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
                 running = False
 
         enemy = Enemy([random.randint(0, width - 150), 0])
-        if enemy.check_collision(enemies) and k_spawn == 70:
+        if enemy.check_collision(enemies) and k_spawn == 50:
             enemies.add(enemy)
 
         for enemy in enemies:
             enemy.move()
-            if k_shoot == 80:
+            if k_shoot == 60:
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets):
                 score += 1
@@ -101,7 +104,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         screen.blit(health_text, health_rect)
 
         clock.tick(fps)
-        k_spawn = (k_spawn + 1) % 71
-        k_shoot = (k_shoot + 1) % 81
+        k_spawn = (k_spawn + 1) % 51
+        k_shoot = (k_shoot + 1) % 61
         pygame.display.flip()
     pygame.quit()
