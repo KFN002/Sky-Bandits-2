@@ -85,7 +85,7 @@ def show_info(player_data):
                      title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_ADAPTIVE,
                      widget_font_color=pygame.Color('white'))
     my_theme.background_color = background
-    menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
+    menu = pygame_menu.Menu('Sky Bandits 2', width, height, theme=my_theme)
     menu.add.label('GAME OVER', font_size=50)
     menu.add.label('Leaderboard')
     table = menu.add.table(font_size=30, border_color=pygame.Color('white'), border_width=3)

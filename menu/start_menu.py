@@ -24,7 +24,7 @@ def start_game(menu):  # проверка введенных данных, за�
 
 def start_menu():  # стартовое меню, логин и тд
     pygame.init()
-    pygame.display.set_caption('Sky Bandits')
+    pygame.display.set_caption('Sky Bandits 2: echo of war')
     mixer.music.load('./data/music/theme.mp3')
     mixer.music.set_volume(0.2)
     mixer.music.play(-1)   # фоновая музыка
@@ -38,7 +38,7 @@ def start_menu():  # стартовое меню, логин и тд
                      title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_ADAPTIVE,
                      widget_font_color=pygame.Color('white'))
     my_theme.background_color = background
-    menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
+    menu = pygame_menu.Menu('Sky Bandits 2', width, height, theme=my_theme)
     menu.add.image('./data/logos/game_dev_logo.jpg', load_from_file=True,
                    align=pygame_menu.locals.ALIGN_RIGHT)
     menu.add.label('Login or Sign up', font_size=40)

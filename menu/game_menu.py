@@ -64,7 +64,7 @@ def start(player_data):
         planes.append((j[0], i))
     money = player_data[2]
 
-    pygame.display.set_caption('Sky Bandits')
+    pygame.display.set_caption('Sky Bandits 2: echo of war')
     mixer.music.load('./data/music/arcade_theme.mp3')
     mixer.music.set_volume(0.2)
     mixer.music.play(-1)
@@ -79,7 +79,7 @@ def start(player_data):
                      widget_font_color=pygame.Color('white'))
     my_theme.background_color = background
 
-    menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
+    menu = pygame_menu.Menu('Sky Bandits 2', width, height, theme=my_theme)
     menu.add.label(f'Money {money}', align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
     current_plane = menu.add.selector('Select Plane', planes, align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
     pic_place = menu.add.image("data/real_pics/i-15.jpg", load_from_file=True, align=pygame_menu.locals.ALIGN_RIGHT)
