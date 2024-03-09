@@ -20,10 +20,11 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     players = pygame.sprite.Group()
     enemy_bullets = pygame.sprite.Group()
     player_bullets = pygame.sprite.Group()
+    player_rockets = pygame.sprite.Group()
 
     background = Background(img_path, plane_data[5])
 
-    player = Player(plane_data)
+    player = Player(plane_data, width, height)
     players.add(player)
 
     running = True
@@ -46,13 +47,20 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
             player.move_right(width)
 
-        if not (key_pressed[pygame.K_a] or key_pressed[pygame.K_LEFT]) and not(key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]):
-            pass
+        if not (key_pressed[pygame.K_a] or key_pressed[pygame.K_LEFT]):
+            player.not_turning(-1)
+
+        if not (key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]):
+            player.not_turning(1)
+
+        print(player.turning_l, player.turning_r)
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     player.shoot(player_bullets)
+                elif pygame.mouse.get_pressed()[2]:
+                    player.shoot_rocket(player_rockets)
 
             if event.type == pygame.QUIT:
                 running = False
@@ -63,11 +71,13 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
 
         for enemy in enemies:
             enemy.move()
-            if k_shoot == 60:
+            if k_shoot == 40:
                 enemy.shoot(enemy_bullets)
-            if enemy.shot(player_bullets):
+            if enemy.shot(player_bullets, plane_data[7]):
                 score += 1
                 player.add_bullets()
+            if enemy.shot(player_rockets, 100):
+                score += 1
             enemy.update_animation(enemies)
 
         for gamer in players:
@@ -75,23 +85,32 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
             gamer.check_collision(enemies)
             gamer.shot(enemy_bullets)
 
-        for elem in player_bullets:
-            elem.update()
+        for rocket in player_rockets:
+            rocket.move(-1)
+            rocket.update_animation(player_rockets)
+            if not rocket.check_collision(enemies) and not rocket.destroyed:
+                rocket.exploded()
 
-        for elem in enemy_bullets:
-            elem.update(-1)
+        for bullet in player_bullets:
+            bullet.update()
+
+        for enemy_bullet in enemy_bullets:
+            enemy_bullet.update(-1)
 
         score_text = font.render(f'Score: {score}', True, (255, 255, 255))
         health_text = font.render(f'Health: {player.hits}', True, (255, 255, 255))
         bullets_text = font.render(f'Bullets: {player.bullets}', True, (255, 255, 255))
+        rockets_text = font.render(f'Rockets: {player.rockets}', True, (255, 255, 255))
 
         bullets_rect = bullets_text.get_rect()
         score_rect = score_text.get_rect()
         health_rect = health_text.get_rect()
+        rockets_rect = rockets_text.get_rect()
 
-        bullets_rect.center = (width - 100, 80)
-        health_rect.center = (width - 100, 110)
         score_rect.center = (width - 100, 50)
+        bullets_rect.center = (width - 100, 80)
+        rockets_rect.center = (width - 100, 110)
+        health_rect.center = (width - 100, 140)
 
         background.update()
         background.render(screen)
@@ -99,12 +118,14 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         enemies.draw(screen)
         enemy_bullets.draw(screen)
         player_bullets.draw(screen)
+        player_rockets.draw(screen)
         screen.blit(score_text, score_rect)
         screen.blit(bullets_text, bullets_rect)
         screen.blit(health_text, health_rect)
+        screen.blit(rockets_text, rockets_rect)
 
         clock.tick(fps)
         k_spawn = (k_spawn + 1) % 51
-        k_shoot = (k_shoot + 1) % 61
+        k_shoot = (k_shoot + 1) % 41
         pygame.display.flip()
     pygame.quit()

@@ -38,7 +38,7 @@ class BasicSprite(pygame.sprite.Sprite):
 
 
 class Player(BasicSprite):
-    def __init__(self, plane_data):
+    def __init__(self, plane_data, width, height):
         BasicSprite.__init__(self,
                              [pygame.image.load(os.path.join(cwd, 'data', 'planes', '0', plane_data[2]))] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
@@ -47,13 +47,25 @@ class Player(BasicSprite):
                              plane_data[5])
         self.bullets = plane_data[9]
         self.bombs = int(plane_data[8])
+        self.rockets = int(plane_data[10])
         self.hits = int(plane_data[6])
         self.explosion = mixer.Sound(os.path.join(cwd, 'data', 'music', 'explosion.wav'))
         self.explosion.set_volume(0.5)
         self.down = False
         self.exploding = False
-        self.rect.x = 600
-        self.rect.y = 300
+        self.turning_r = 0
+        self.turning_l = 0
+        self.rect.x = int(width * 0.5)
+        self.rect.y = int(height * 0.5)
+
+    def update_animation(self, group):
+        if self.cur_frame < len(self.frames) - 1 and self.destroyed:
+            self.cur_frame += 1
+            self.image = self.frames[self.cur_frame]
+        elif self.destroyed:
+            group.remove(self)
+            self.sound.set_volume(0.5)
+            self.sound.play()
 
     def move_up(self):
         if self.rect.y <= 0:
@@ -72,12 +84,14 @@ class Player(BasicSprite):
             self.rect.x = 0
         else:
             self.rect.x -= self.speed
+            self.turning_l += 1
 
     def move_right(self, width):
         if self.rect.x >= width - self.rect.width:
             self.rect.x = width - self.rect.width
         else:
             self.rect.x += self.speed
+            self.turning_r += 1
 
     def update(self, group, player_data, plane_data, score):
         if self.down and self.cur_frame < len(self.frames) - 1 and self.exploding:
@@ -109,6 +123,13 @@ class Player(BasicSprite):
             bombs.add(bmb)
             self.bombs -= 1
 
+    def shoot_rocket(self, rockets):
+        if self.rockets >= 1:
+            rocket = AARocket(self.rect.x + 25, self.rect.midtop[1] - 50)
+            rockets.add(rocket)
+            rocket.chase()
+            self.rockets -= 1
+
     def hit(self):
         self.hits -= 1
         if self.hits <= 0:
@@ -136,6 +157,12 @@ class Player(BasicSprite):
             bullets.remove(collided)
             self.hit()
 
+    def not_turning(self, vector):
+        if self.turning_l > 0 and vector == -1:
+            self.turning_l -= 1
+        if self.turning_r > 0 and vector == 1:
+            self.turning_r -= 1
+
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, image, speed, px):
@@ -160,7 +187,7 @@ class Bomb(BasicSprite):
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))],
-                             speed * 0.5)
+                             speed)
         self.rect.x = mid_bottom[0] - 10
         self.rect.y = mid_bottom[1] - 60
         self.size_x = 20
@@ -241,18 +268,21 @@ class Enemy(BasicSprite):
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))], 6)
         self.rect.x = enemy_pos[0]
         self.rect.y = enemy_pos[1]
+        self.health = 6
         self.sound = mixer.Sound(os.path.join(cwd, 'data', 'music', 'explosion.wav'))
 
-    def shot(self, bullets):
+    def shot(self, bullets, damage):
         collided = pygame.sprite.spritecollideany(self, bullets)
         if collided:
             bullets.remove(collided)
-            self.destroyed = True
-            return True
+            self.health -= damage
+            if self.health <= 0:
+                self.destroyed = True
+                return True
         return False
 
     def shoot(self, group):
-        bullet = Bullet(pygame.image.load(os.path.join(cwd, 'data', 'arms', 'bullet.png')), self.speed,
+        bullet = Bullet(pygame.image.load(os.path.join(cwd, 'data', 'arms', 'bullet.png')), self.speed * 1.5,
                         self.rect.midbottom)
         group.add(bullet)
 

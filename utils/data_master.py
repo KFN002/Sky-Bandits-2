@@ -37,7 +37,7 @@ def change_value(price, player_data, plane_id):
     if player_data[2] - price < 0:
         return False
 
-    new_planes = ''.join('1' if idx == int(plane_id) else val for idx, val in enumerate(player_data[3]))
+    new_planes = ''.join('1' if idx + 1 == int(plane_id) else val for idx, val in enumerate(player_data[3]))
     print(new_planes)
 
     cursor.execute("UPDATE users SET money = ?, planes = ? WHERE login = ?",
@@ -89,8 +89,8 @@ def show_info(player_data):
     menu.add.label('GAME OVER', font_size=50)
     menu.add.label('Leaderboard')
     table = menu.add.table(font_size=30, border_color=pygame.Color('white'), border_width=3)
-    for gamer in leaderboard_data:
-        table.add_row(tuple(gamer))
+    for gamer in list(map(lambda x: (x[0], x[1]), leaderboard_data)):
+        table.add_row(gamer)
     continue_btn = menu.add.button('Continue', font_size=35)
     menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30)
     menu.center_content()
