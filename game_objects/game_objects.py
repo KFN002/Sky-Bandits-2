@@ -314,13 +314,13 @@ class Enemy(BasicSprite):
 
 
 class Decorations(BasicSprite):
-    def __init__(self, speed, x, y, level=1):
+    def __init__(self, speed, x, y, level=1, dec_type=1):
         if level == 2:
             decoration = choice([str(i) for i in range(1, 11)])
             frames = [pygame.image.load(os.path.join(cwd, 'data', 'backgrounds', 'clouds', f"{decoration}.png"))] + [
                 pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))]
         else:
-            if choice([True, False]):
+            if dec_type == 1:
                 decoration = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
                                      'building7'])
                 frames = [pygame.image.load(

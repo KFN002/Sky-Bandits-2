@@ -7,7 +7,8 @@ def play(plane_data, player_data):
     pygame.init()
     k_spawn = 0
     k_spawn_aa = 0
-    k_spawn_decs = 0
+    k_spawn_dec_b = 0
+    k_spawn_dec_t = 0
     score = 0
     size = width, height = 1200, 800
 
@@ -61,13 +62,17 @@ def play(plane_data, player_data):
             if event.type == pygame.QUIT:
                 running = False
 
-        enemy_base = EnemyBase(plane_data[5], [random.randint(0, width - 150), -50])
-        if enemy_base.check_collision(enemies) and k_spawn == 20 and enemy_base.check_collision(decorations):
+        enemy_base = EnemyBase(plane_data[5], [random.randint(0, width - 150), -100])
+        if enemy_base.check_collision(enemies) and k_spawn == 10 and enemy_base.check_collision(decorations):
             enemies.add(enemy_base)
 
-        decor = Decorations(plane_data[5], *[random.randint(0, width - 150), -50])
-        if decor.check_collision(decorations) and k_spawn_decs == 10 and decor.check_collision(enemies):
-            decorations.add(decor)
+        decor_b = Decorations(plane_data[5], *[random.randint(0, width - 150), -100])
+        if decor_b.check_collision(decorations) and k_spawn_dec_b == 30 and decor_b.check_collision(enemies):
+            decorations.add(decor_b)
+
+        decor_t = Decorations(plane_data[5], *[random.randint(0, width - 150), -100], dec_type=2)
+        if decor_t.check_collision(decorations) and k_spawn_dec_t == 10 and decor_t.check_collision(enemies):
+            decorations.add(decor_t)
 
         if k_spawn_aa == 150:
             aa = AARocket(player.rect.x + 25, height)
@@ -126,7 +131,8 @@ def play(plane_data, player_data):
         pygame.display.flip()
         clock.tick(fps)
         k_spawn_aa = (k_spawn_aa + 1) % 151
-        k_spawn = (k_spawn + 1) % 21
-        k_spawn_decs = (k_spawn_decs + 1) % 11
+        k_spawn = (k_spawn + 1) % 11
+        k_spawn_dec_t = (k_spawn_dec_t + 1) % 11
+        k_spawn_dec_b = (k_spawn_dec_b + 1) % 31
 
     pygame.quit()

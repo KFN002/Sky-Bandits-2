@@ -65,11 +65,11 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
             if event.type == pygame.QUIT:
                 running = False
 
-        enemy = Enemy([random.randint(0, width - 150), -50])
+        enemy = Enemy([random.randint(0, width - 150), -100])
         if enemy.check_collision(enemies) and k_spawn == 80:
             enemies.add(enemy)
 
-        decor = Decorations(plane_data[5] * 0.4, *[random.randint(0, width - 150), -50], 2)
+        decor = Decorations(plane_data[5] * 0.4, *[random.randint(0, width - 150), -100], 2)
         if decor.check_collision(decorations) and k_spawn_dec == 20 and decor.check_collision(enemies):
             decorations.add(decor)
 
