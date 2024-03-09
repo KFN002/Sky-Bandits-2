@@ -1,4 +1,5 @@
 import os
+import random
 import pygame
 from pygame import mixer
 from utils import data_master
@@ -6,6 +7,11 @@ from random import choice
 import threading
 
 cwd = os.getcwd()
+enemy_map = {"enemy_1.png": {"health": 10, "speed": 4},
+             "enemy_2.png": {"health": 8, "speed": 5},
+             "enemy_3.png": {"health": 6, "speed": 5},
+             "enemy_4.png": {"health": 5, "speed": 6},
+             "enemy_5.png": {"health": 4, "speed": 5}}
 
 
 class BasicSprite(pygame.sprite.Sprite):
@@ -201,7 +207,7 @@ class Bomb(BasicSprite):
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))],
-                             speed)
+                             speed * 0.5)
         self.rect.x = mid_bottom[0] - 10
         self.rect.y = mid_bottom[1] - 60
         self.size_x = 20
@@ -275,14 +281,17 @@ class AARocket(BasicSprite):
 
 class Enemy(BasicSprite):
     def __init__(self, enemy_pos):
-        BasicSprite.__init__(self, [pygame.image.load(os.path.join(cwd, 'data', 'planes', '0',
-                                                                   '0.png'))] +
+        self.enemy_type = random.choice(
+            [f'enemy_{i}.png' for i in range(1, 6)])
+        self.health = enemy_map[self.enemy_type]["health"]
+        self.speed = enemy_map[self.enemy_type]["speed"]
+        BasicSprite.__init__(self, [
+            pygame.image.load(os.path.join(cwd, 'data', 'planes', 'enemies', f'{self.enemy_type}'))] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
-                             [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))], 6)
+                             [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))], self.speed)
         self.rect.x = enemy_pos[0]
         self.rect.y = enemy_pos[1]
-        self.health = 6
         self.sound = mixer.Sound(os.path.join(cwd, 'data', 'music', 'explosion.wav'))
 
     def shot(self, bullets, damage):
@@ -329,7 +338,7 @@ class Decorations(BasicSprite):
 
 
 class Background:
-    def __init__(self, img, speed):
+    def __init__(self, img, speed, level_k=1):
         self.bgimage = pygame.image.load(os.path.join(cwd, img))
         self.rectBGimg = self.bgimage.get_rect()
 
@@ -339,7 +348,7 @@ class Background:
         self.bgY2 = -self.rectBGimg.height
         self.bgX2 = 0
 
-        self.moving_speed = int(abs(speed) * 0.5)
+        self.moving_speed = int(abs(speed) * 0.5 * level_k)
 
     def update(self):
         self.bgY1 += self.moving_speed

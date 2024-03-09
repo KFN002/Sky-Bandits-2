@@ -8,7 +8,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     k_spawn = 0
     k_shoot = 0
     score = 0
-    size = width, height = 1500, 1500
+    size = width, height = 1500, 900
 
     screen = pygame.display.set_mode(size)
     img_path = random.choice(['./data/backgrounds/jungles.png',
@@ -22,7 +22,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     player_bullets = pygame.sprite.Group()
     player_rockets = pygame.sprite.Group()
 
-    background = Background(img_path, plane_data[5])
+    background = Background(img_path, plane_data[5], level_k=0.5)
 
     player = Player(plane_data, width, height)
     players.add(player)
@@ -53,8 +53,6 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         if not (key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]):
             player.not_turning(1)
 
-        print(player.turning_l, player.turning_r)
-
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
@@ -66,12 +64,12 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
                 running = False
 
         enemy = Enemy([random.randint(0, width - 150), 0])
-        if enemy.check_collision(enemies) and k_spawn == 50:
+        if enemy.check_collision(enemies) and k_spawn == (int((1 / plane_data[5] * 100) * 6)):
             enemies.add(enemy)
 
         for enemy in enemies:
             enemy.move()
-            if k_shoot == 40:
+            if k_shoot == (int((1 / plane_data[5] * 100) * 6)):
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets, plane_data[7]):
                 score += 1
@@ -125,7 +123,7 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
         screen.blit(rockets_text, rockets_rect)
 
         clock.tick(fps)
-        k_spawn = (k_spawn + 1) % 51
-        k_shoot = (k_shoot + 1) % 41
+        k_spawn = (k_spawn + 1) % (int((1 / plane_data[5] * 100) * 6) + 1)
+        k_shoot = (k_shoot + 1) % (int((1 / plane_data[5] * 100) * 6) + 1)
         pygame.display.flip()
     pygame.quit()

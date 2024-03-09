@@ -9,7 +9,7 @@ def play(plane_data, player_data):
     k_spawn_aa = 0
     k_spawn_decs = 0
     score = 0
-    size = width, height = 1500, 1500
+    size = width, height = 1500, 900
 
     screen = pygame.display.set_mode(size)
     img_path = random.choice(['./data/backgrounds/jungles.png',
@@ -24,7 +24,7 @@ def play(plane_data, player_data):
     enemy_aa = pygame.sprite.Group()
 
     background = Background(img_path, plane_data[5])
-    player = Player(plane_data)
+    player = Player(plane_data, width, height)
     players.add(player)
 
     running = True
@@ -47,6 +47,12 @@ def play(plane_data, player_data):
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
             player.move_right(width)
 
+        if not (key_pressed[pygame.K_a] or key_pressed[pygame.K_LEFT]):
+            player.not_turning(-1)
+
+        if not (key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]):
+            player.not_turning(1)
+
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
@@ -63,7 +69,7 @@ def play(plane_data, player_data):
         if decor.check_collision(decorations) and k_spawn_decs == 30 and decor.check_collision(enemies):
             decorations.add(decor)
 
-        if k_spawn_aa == 150:
+        if k_spawn_aa == (int((1 / plane_data[5] * 100) * 8)):
             aa = AARocket(player.rect.x + 25, height)
             enemy_aa.add(aa)
             aa.chase()
@@ -119,7 +125,7 @@ def play(plane_data, player_data):
 
         pygame.display.flip()
         clock.tick(fps)
-        k_spawn_aa = (k_spawn_aa + 1) % 151
+        k_spawn_aa = (k_spawn_aa + 1) % ((int((1 / plane_data[5] * 100) * 8)) + 1)
         k_spawn = (k_spawn + 1) % 51
         k_spawn_decs = (k_spawn_decs + 1) % 31
 

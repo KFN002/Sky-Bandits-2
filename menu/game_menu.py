@@ -36,7 +36,7 @@ def start_game(plane_status, plane, player_data):   # запуск уровня,
         mixer.music.play(-1)
 
         if choice([True, False]):
-            games.game_2.play(list(plane_data), player_data)
+            games.game_1.play(list(plane_data), player_data)
         else:
             games.game_2.play(list(plane_data), player_data)
 
