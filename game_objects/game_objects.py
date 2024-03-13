@@ -263,7 +263,7 @@ class AARocket(BasicSprite):
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', f'boom{i}.png')) for i in
                               range(1, 7)] +
                              [pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))],
-                             16)
+                             14)
         self.rect.x = x
         self.rect.y = height
         self.sound = mixer.Sound(os.path.join(cwd, 'data', 'music', 'explosion.wav'))
