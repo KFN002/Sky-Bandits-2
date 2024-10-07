@@ -331,7 +331,11 @@ class Decorations(BasicSprite):
                 frames = [pygame.image.load(os.path.join(cwd, 'data', 'backgrounds', 'trees', f"{decoration}.png"))] + [
                     pygame.image.load(os.path.join(cwd, 'data', 'booms', 'blank_space.png'))]
 
-        BasicSprite.__init__(self, frames, speed * 0.5)
+        if level == 1:
+            BasicSprite.__init__(self, frames, speed * 0.5)
+        elif level == 2:
+            BasicSprite.__init__(self, frames, speed * 0.8)
+
         self.rect.x = x
         self.rect.y = y
 
