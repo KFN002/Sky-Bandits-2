@@ -343,8 +343,6 @@ class Decorations(BasicSprite):
                 collided.sound.stop()
                 if self.cur_frame < len(self.frames) - 1:
                     self.cur_frame += 1
-                return True
-            return False
         self.image = self.frames[self.cur_frame]
 
 
